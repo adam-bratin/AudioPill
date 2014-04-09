@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="core">
+  <library name="Parse-1.4.3">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../zxing/android/libs/core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/Parse-1.4.3.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

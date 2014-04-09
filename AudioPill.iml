@@ -24,6 +24,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Parse-1.4.3" level="project" />
   </component>
 </module>
 
