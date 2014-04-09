@@ -23,12 +23,13 @@ public class myActivity extends Activity implements ScanditSDKListener {
      * Called when the activity is first created.
      */
     private ScanditSDKAutoAdjustingBarcodePicker picker;
-    private Resources res = getResources();
+    private Resources res;
     public static TextToSpeech tts;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        res = getResources();
         String appKey = res.getString(R.string.ScaneditAppKey);
         picker = new
         ScanditSDKAutoAdjustingBarcodePicker(this, appKey,1);
