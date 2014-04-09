@@ -54,7 +54,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
             }
         });
         setContentView(picker);
-        Parse.initialize(this, "APP_ID", "CLIENT_ID");
+        Parse.initialize(this, res.getString(R.string.Parse_APP_ID), res.getString(R.string.Parse_CLIENT_ID));
         ParseAnalytics.trackAppOpened(getIntent());
     }
 
