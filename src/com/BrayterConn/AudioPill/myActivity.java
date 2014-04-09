@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import com.mirasense.scanditsdk.ScanditSDKAutoAdjustingBarcodePicker;
 import com.mirasense.scanditsdk.interfaces.ScanditSDKListener;
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
 
 
 import java.util.Locale;
@@ -52,6 +54,8 @@ public class myActivity extends Activity implements ScanditSDKListener {
             }
         });
         setContentView(picker);
+        Parse.initialize(this, "APP_ID", "CLIENT_ID");
+        ParseAnalytics.trackAppOpened(getIntent());
     }
 
     @Override
