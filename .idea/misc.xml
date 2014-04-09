@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="android" url="file://$PROJECT_DIR$/../zxing-master/android" />
+    <file type="android" url="file://$PROJECT_DIR$/../zxing-master/androidtest" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/../zxing-master/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/../zxing-master/core/pom.xml" />
+        <option value="$PROJECT_DIR$/../zxing-master/javase/pom.xml" />
+        <option value="$PROJECT_DIR$/../zxing-master/pom.xml" />
+        <option value="$PROJECT_DIR$/../zxing-master/zxing.appspot.com/pom.xml" />
+        <option value="$PROJECT_DIR$/../zxing-master/zxingorg/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.0.3 Glass Development Kit Sneak Peek (1)" project-jdk-type="Android SDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
+

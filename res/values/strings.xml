@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AudioPill</string>
+    <string name="ScannerActivity_voice_trigger">scan a barcode</string>
+    <string name="ScaneditAppKey">StN6dL6LEeOPa5RnNubY4mZ/2WSKz1jJQoe5U0XTnw8</string>
+    <string name="serverIPAddress">http://91.98.191.1</string>
+</resources>
