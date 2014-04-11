@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.mirasense.scanditsdk.ScanditSDKAutoAdjustingBarcodePicker;
+import com.mirasense.scanditsdk.interfaces.ScanditSDK;
 import com.mirasense.scanditsdk.interfaces.ScanditSDKListener;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
@@ -32,7 +33,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
         super.onCreate(savedInstanceState);
         res = getResources();
         picker = new
-        ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey),1);
+        ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey), ScanditSDK.CAMERA_FACING_FRONT);
         // Specify the object that will receive the callback events
         picker.getOverlayView().addListener(this);
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
