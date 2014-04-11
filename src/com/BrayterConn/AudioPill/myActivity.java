@@ -31,9 +31,8 @@ public class myActivity extends Activity implements ScanditSDKListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         res = getResources();
-        String appKey = res.getString(R.string.ScaneditAppKey);
         picker = new
-        ScanditSDKAutoAdjustingBarcodePicker(this, appKey,1);
+        ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey),1);
         // Specify the object that will receive the callback events
         picker.getOverlayView().addListener(this);
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
