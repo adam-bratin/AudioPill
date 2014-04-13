@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.mirasense.scanditsdk.ScanditSDKAutoAdjustingBarcodePicker;
@@ -12,10 +14,7 @@ import com.mirasense.scanditsdk.interfaces.ScanditSDK;
 import com.mirasense.scanditsdk.interfaces.ScanditSDKListener;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
-import com.parse.ParseObject;
 
-
-import java.util.Locale;
 
 /**
  * Created by Adam on 4/7/14.
@@ -24,60 +23,65 @@ public class myActivity extends Activity implements ScanditSDKListener {
     /**
      * Called when the activity is first created.
      */
-    private ScanditSDKAutoAdjustingBarcodePicker picker;
-    private Resources res;
+    private ScanditSDK mBarcodePicker;
     public static TextToSpeech tts;
+    private  Resources res;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         res = getResources();
-        picker = new
-        ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey), ScanditSDK.CAMERA_FACING_FRONT);
+        initializeParse();
+        initializeBarcodeScanner();
+        initializeTextToSpeech();
+    }
+
+    private void initializeParse() {
+        Parse.initialize(this, res.getString(R.string.Parse_APP_ID), res.getString(R.string.Parse_CLIENT_ID));
+        ParseAnalytics.trackAppOpened(getIntent());
+//        ParseObject testObject = new ParseObject("TestObject");
+//        testObject.put("foo", "bar");
+//        testObject.saveInBackground();
+    }
+
+    private void initializeBarcodeScanner() {
+        // Switch to full screen.
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        ScanditSDKAutoAdjustingBarcodePicker  picker = new
+                ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey), ScanditSDK.CAMERA_FACING_FRONT);
         // Specify the object that will receive the callback events
-        picker.getOverlayView().addListener(this);
+        setContentView(picker);
+        mBarcodePicker = picker;
+        mBarcodePicker.getOverlayView().addListener(this);
+    }
+
+    private void initializeTextToSpeech() {
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-
-                    int result = tts.setLanguage(Locale.US);
-
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Log.e("TTS", "This Language is not supported");
-                    } else {
-                        tts.speak("", TextToSpeech.QUEUE_FLUSH, null);
-                    }
-
-                } else {
-                    Log.e("TTS", "Initilization Failed!");
-                }
+                //do nothing
             }
         });
-        setContentView(picker);
-        Parse.initialize(this, res.getString(R.string.Parse_APP_ID), res.getString(R.string.Parse_CLIENT_ID));
-        ParseAnalytics.trackAppOpened(getIntent());
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
     }
 
     @Override
     protected void onResume() {
-        picker.startScanning();
+        mBarcodePicker.startScanning();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        picker.stopScanning();
+        mBarcodePicker.stopScanning();
         super.onPause();
     }
 
     @Override
     public void didScanBarcode(String barcode, String symbology) {
         // this callback is only called whenever a barcode is decoded.
+        Log.d("debug","scanded barcode");
         StringBuffer buff = new StringBuffer();
         for (char c : barcode.toCharArray()) {
             if (c>30) {
@@ -85,8 +89,6 @@ public class myActivity extends Activity implements ScanditSDKListener {
             }
         }
         Toast.makeText(this,symbology + ":" + buff.toString(),Toast.LENGTH_LONG).show();
-        PostBarcodeAsync barsync = new PostBarcodeAsync();
-        barsync.doInBackground(buff.toString(), res.getString(R.string.serverIPAddress));
 
 
     }
@@ -97,7 +99,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
     @Override
     public void didCancel() {
         // this callback is deprecated since Scandit SDK 3.0
-        picker.stopScanning();
+        mBarcodePicker.stopScanning();
         finish();
     }
 }
