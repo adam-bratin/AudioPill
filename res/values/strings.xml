@@ -2,8 +2,7 @@
 <resources>
     <string name="app_name">AudioPill</string>
     <string name="ScannerActivity_voice_trigger">scan a barcode</string>
-    <string name="ScaneditAppKey">StN6dL6LEeOPa5RnNubY4mZ/2WSKz1jJQoe5U0XTnw8</string>
-    <string name="serverIPAddress">http://91.98.191.1</string>
+    <string name="ScaneditAppKey">StN6dL6LEeOPa5RnNubY4qdrdH7juvLaLI0gCtVw/w0</string>
     <string name="Parse_CLIENT_ID">RhTiRYzjS2NRP4vZcHv1t14ohPX0mzMmj2MfNGNy</string>
     <string name="Parse_APP_ID">h02qEiBkxXvjyGiHWStSHTtweoMkOZvdVUavNAZA</string>
 </resources>
