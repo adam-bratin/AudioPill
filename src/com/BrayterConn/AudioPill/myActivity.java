@@ -41,13 +41,14 @@ public class myActivity extends Activity implements ScanditSDKListener {
     private ScanditSDK mBarcodePicker;
     public static TextToSpeech tts;
     private  Resources res;
+    private Card card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         res = getResources();
         initializeParse();
-        //initializeTextToSpeech();
+        initializeTextToSpeech();
         initializeBarcodeScanner();
     }
 
@@ -78,13 +79,9 @@ public class myActivity extends Activity implements ScanditSDKListener {
         ScanditSDKAutoAdjustingBarcodePicker  picker = new
                 ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey), ScanditSDK.CAMERA_FACING_FRONT);
         // Specify the object that will receive the callback events
-
-//        picker.set2DScanningEnabled(false);
-//        picker.set1DScanningEnabled(true);
         setContentView(picker);
         mBarcodePicker = picker;
         mBarcodePicker.getOverlayView().addListener(this);
-//        mBarcodePicker.startScanning();
     }
 
 
@@ -100,7 +97,9 @@ public class myActivity extends Activity implements ScanditSDKListener {
     @Override public boolean onKeyDown(int keycode, KeyEvent event){
         if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
 //            // user tapped touchpad, do something
-            mBarcodePicker.startScanning();
+            if (!mBarcodePicker.isScanning()) {
+                initializeBarcodeScanner();
+            }
             return true;
         }
         else {
@@ -181,8 +180,10 @@ public class myActivity extends Activity implements ScanditSDKListener {
 //                }
 //            }
 //        });
-        Card card = new Card(this);
-        card.setText(barcode.toString());
+        StringBuffer builder = new StringBuffer();
+        builder.append(barcode.substring(0,3) + '-' + barcode.substring(4,7) + '-' + barcode.substring(8));
+        card = new Card(this);
+        card.setText(builder.toString());
         setContentView(card.getView());
     }
     @Override
