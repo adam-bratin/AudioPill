@@ -29,6 +29,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
+import java.util.List;
 
 
 /**
@@ -48,7 +49,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
         super.onCreate(savedInstanceState);
         res = getResources();
         initializeParse();
-        initializeTextToSpeech();
+//        initializeTextToSpeech();
         initializeBarcodeScanner();
     }
 
@@ -78,10 +79,12 @@ public class myActivity extends Activity implements ScanditSDKListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         ScanditSDKAutoAdjustingBarcodePicker  picker = new
                 ScanditSDKAutoAdjustingBarcodePicker(this, res.getString(R.string.ScaneditAppKey), ScanditSDK.CAMERA_FACING_FRONT);
+        picker.set2DScanningEnabled(false);
         // Specify the object that will receive the callback events
         setContentView(picker);
         mBarcodePicker = picker;
         mBarcodePicker.getOverlayView().addListener(this);
+        mBarcodePicker.startScanning();
     }
 
 
@@ -92,19 +95,6 @@ public class myActivity extends Activity implements ScanditSDKListener {
                 //do nothing
             }
         });
-    }
-
-    @Override public boolean onKeyDown(int keycode, KeyEvent event){
-        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
-//            // user tapped touchpad, do something
-            if (!mBarcodePicker.isScanning()) {
-                initializeBarcodeScanner();
-            }
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
 //    @Override
@@ -145,14 +135,6 @@ public class myActivity extends Activity implements ScanditSDKListener {
 //    }
 
 
-    private void pictureSavedSuccessfully(){
-        Toast.makeText(this, "Picture sent to Server. Waiting for barcode to be analyzed", Toast.LENGTH_LONG);
-    }
-
-    private void pictureSaveDidNotSucceed() {
-        Toast.makeText(this, "Error: Picture failed to be sent to Server. Retry Sending Picture", Toast.LENGTH_LONG);
-    }
-
     @Override
     protected void onResume() {
         mBarcodePicker.startScanning();
@@ -167,24 +149,27 @@ public class myActivity extends Activity implements ScanditSDKListener {
     }
 
     @Override
-    public void didScanBarcode(String barcode, String Sybolic) {
+    public void didScanBarcode(String barcode, String Symbolic) {
         // this callback is only called whenever a barcode is decoded.
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery("Package");
-//        query.whereEqualTo("NDCPACKAGECODE",barcode);
-//        query.setLimit(1);
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
-//                if (e == null) {
-//                    String id = parseObjects.get(0).get("PRODUCTID").toString();
-//                }
-//            }
-//        });
+        mBarcodePicker.stopScanning();
         StringBuffer builder = new StringBuffer();
         builder.append(barcode.substring(0,3) + '-' + barcode.substring(4,7) + '-' + barcode.substring(8));
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Package");
         card = new Card(this);
-        card.setText(builder.toString());
+        card.setText("Scanning ...\n" + builder.toString());
+        card.setText("Scanning ...\n" + builder.toString());
         setContentView(card.getView());
+        query.whereEqualTo("NDCPACKAGECODE",barcode);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
+                if (e == null) {
+                    String id = parseObjects.get(0).get("PRODUCTID").toString();
+                }
+            }
+        });
+
     }
     @Override
     public void didManualSearch(String entry) {
