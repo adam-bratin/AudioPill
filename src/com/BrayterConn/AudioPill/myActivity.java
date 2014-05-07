@@ -30,6 +30,12 @@ public class myActivity extends Activity implements ScanditSDKListener {
     public static TextToSpeech tts;
     private  Resources res;
     private Card card;
+    private String propName;
+    private String dosForm;
+    private String packdesc;
+    private String id;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,17 +113,46 @@ public class myActivity extends Activity implements ScanditSDKListener {
         card.setText("Scanning ...\n" + builder.toString());
         setContentView(card.getView());
         tts.speak("Barcode Found. Scannning ...",TextToSpeech.QUEUE_FLUSH,null);
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery("Package");
-//        query.whereEqualTo("NDCPACKAGECODE",barcode);
-//        query.setLimit(1);
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
-//                if (e == null) {
-//                    String id = parseObjects.get(0).get("PRODUCTID").toString();
-//                }
-//            }
-//        });
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Package");
+        query.whereEqualTo("NDCPACKAGECODE",barcode);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
+                if (e == null) {
+                    String id = parseObjects.get(0).get("PRODUCTID").toString();
+                    ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Product");
+                    final String packdescTemp = parseObjects.get(0).get("PACKAGEDESCRIPTION").toString();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            packdesc=packdescTemp;
+                        }
+                    });
+                    query2.whereEqualTo("PRODUCTID", id);
+                    query2.setLimit(1);
+                    query2.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> parseObjects2, com.parse.ParseException e2) {
+                            if (e2==null) {
+                                final String propNameTemp = parseObjects2.get(0).get("PROPRIETARYNAME").toString();
+                                final String dosFormTemp = parseObjects2.get(0).get("DOSAGEFORMNAME").toString();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        propName = propNameTemp;
+                                        dosForm = dosFormTemp;
+                                        tts.speak(propName, TextToSpeech.QUEUE_ADD, null);
+                                        tts.speak(dosForm, TextToSpeech.QUEUE_ADD, null);
+                                        tts.speak(packdesc, TextToSpeech.QUEUE_ADD, null);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
 
     }
     @Override
