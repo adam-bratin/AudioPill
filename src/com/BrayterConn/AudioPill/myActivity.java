@@ -108,9 +108,10 @@ public class myActivity extends Activity implements ScanditSDKListener {
         // this callback is only called whenever a barcode is decoded.
         mBarcodePicker.stopScanning();
         StringBuffer builder = new StringBuffer();
-        builder.append(barcode.substring(0,3) + '-' + barcode.substring(4,7) + '-' + barcode.substring(8));
+        builder.append(barcode.substring(1,5) + '-' + barcode.substring(5,9) + '-' + barcode.substring(9,11));
+        Log.d("Barcode",builder.toString());
         barcode = builder.toString();
-//        barcode = "63629-3366-5";
+//        barcode = "0573-0134-80";
         card = new Card(this);
         card.setText("Scanning ...\n" + barcode);
         setContentView(card.getView());
@@ -163,6 +164,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
                                 });
                             }
                             else {
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
