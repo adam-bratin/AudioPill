@@ -7,7 +7,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.google.android.glass.app.Card;
 import com.mirasense.scanditsdk.ScanditSDKAutoAdjustingBarcodePicker;
 import com.mirasense.scanditsdk.interfaces.ScanditSDK;
@@ -23,9 +22,7 @@ import java.util.List;
  * Created by Adam on 4/7/14.
  */
 public class myActivity extends Activity implements ScanditSDKListener {
-    /**
-     * Called when the activity is first created.
-     */
+
     private ScanditSDK mBarcodePicker;
     public static TextToSpeech tts;
     private  Resources res;
@@ -36,7 +33,9 @@ public class myActivity extends Activity implements ScanditSDKListener {
     private String id;
 
 
-
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +58,7 @@ public class myActivity extends Activity implements ScanditSDKListener {
 //                testObject.saveInBackground();
             }
         });
-        parse.doInBackground(res.getString(R.string.Parse_CLIENT_ID),res.getString(R.string.Parse_APP_ID));
+        parse.doInBackground(res.getString(R.string.Parse_APP_ID),res.getString(R.string.Parse_CLIENT_ID));
 
     }
 
@@ -93,13 +92,14 @@ public class myActivity extends Activity implements ScanditSDKListener {
     @Override
     protected void onResume() {
         mBarcodePicker.startScanning();
+        initializeTextToSpeech();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        String text = "";
         mBarcodePicker.stopScanning();
+        tts.shutdown();
         super.onPause();
     }
 
@@ -109,8 +109,10 @@ public class myActivity extends Activity implements ScanditSDKListener {
         mBarcodePicker.stopScanning();
         StringBuffer builder = new StringBuffer();
         builder.append(barcode.substring(0,3) + '-' + barcode.substring(4,7) + '-' + barcode.substring(8));
+        barcode = builder.toString();
+//        barcode = "63629-3366-5";
         card = new Card(this);
-        card.setText("Scanning ...\n" + builder.toString());
+        card.setText("Scanning ...\n" + barcode);
         setContentView(card.getView());
         tts.speak("Barcode Found. Scannning ...",TextToSpeech.QUEUE_FLUSH,null);
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Package");
@@ -118,11 +120,12 @@ public class myActivity extends Activity implements ScanditSDKListener {
         query.setLimit(1);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
-                if (e == null) {
+            public void done(final List<ParseObject> parseObjects, com.parse.ParseException e) {
+                if (e == null && parseObjects.size()>0) {
                     String id = parseObjects.get(0).get("PRODUCTID").toString();
                     ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Product");
                     final String packdescTemp = parseObjects.get(0).get("PACKAGEDESCRIPTION").toString();
+                    Log.d("ProductID", id);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -134,7 +137,8 @@ public class myActivity extends Activity implements ScanditSDKListener {
                     query2.findInBackground(new FindCallback<ParseObject>() {
                         @Override
                         public void done(List<ParseObject> parseObjects2, com.parse.ParseException e2) {
-                            if (e2==null) {
+                            if (e2==null && parseObjects2.size()>0) {
+                                Log.d("Size of Query2:", Integer.toString(parseObjects2.size()));
                                 final String propNameTemp = parseObjects2.get(0).get("PROPRIETARYNAME").toString();
                                 final String dosFormTemp = parseObjects2.get(0).get("DOSAGEFORMNAME").toString();
                                 runOnUiThread(new Runnable() {
@@ -142,19 +146,47 @@ public class myActivity extends Activity implements ScanditSDKListener {
                                     public void run() {
                                         propName = propNameTemp;
                                         dosForm = dosFormTemp;
-                                        tts.speak(propName, TextToSpeech.QUEUE_ADD, null);
-                                        tts.speak(dosForm, TextToSpeech.QUEUE_ADD, null);
-                                        tts.speak(packdesc, TextToSpeech.QUEUE_ADD, null);
+                                        StringBuilder builder = new StringBuilder();
+                                        builder.append("Name: ");
+                                        builder.append(propName);
+                                        builder.append("\n");
+                                        builder.append("Dosage Type: ");
+                                        builder.append(dosForm);
+                                        builder.append("\n");
+                                        builder.append("Packaging Type: ");
+                                        builder.append(packdesc);
+                                        card.setText(builder.toString());
+                                        setContentView(card.getView());
+                                        tts.speak(builder.toString(),TextToSpeech.QUEUE_ADD, null);
+                                        sendToCalendar();
+                                    }
+                                });
+                            }
+                            else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        card.setText("Error: Unable to find Medicine in database. \n Try Again.");
+                                        setContentView(card.getView());
                                     }
                                 });
                             }
                         }
                     });
                 }
+                else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            card.setText("Error: Unable to find Medicine in database. \n Try Again.");
+                            setContentView(card.getView());
+                        }
+                    });
+                }
             }
         });
-
     }
+
     @Override
     public void didManualSearch(String entry) {
         // this callback is only called when you use the Scandit SDK search bar.
@@ -163,6 +195,14 @@ public class myActivity extends Activity implements ScanditSDKListener {
     public void didCancel() {
         // this callback is deprecated since Scandit SDK 3.0
         mBarcodePicker.stopScanning();
+        tts.shutdown();
         finish();
+    }
+
+    private void sendToCalendar(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("Sending to Calendar ... \n");
+        builder.append("Scheduling first dosage for tomorrow 9 A M");
+        tts.speak(builder.toString(),TextToSpeech.QUEUE_ADD,null);
     }
 }
